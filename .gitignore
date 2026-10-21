@@ -1,0 +1,21 @@
+# Python 产物
+pipeline/inventory.json
+pipeline/import.sql
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+steam-inventory-worker/node_modules/
+
+# 编辑器
+.vscode/
+.idea/
+
+# 日志
+*.log
+
+# 敏感信息
+.env
+*.key
+备忘录.txt

@@ -1,0 +1,8 @@
+name = "steam-inventory-worker"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "steam-inventory-db"
+database_id = "2dd6cdb0-8818-48cf-a42b-5cefc93ea4b3"
