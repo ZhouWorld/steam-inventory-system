@@ -42,6 +42,21 @@ jobs:
               working-directory: ./pipeline
               run: python build_d1_sql.py --in inventory.json --out import.sql
 
+            - name: Check inventory result
+              if: always()
+              working-directory: ./pipeline
+              run: |
+                  if [ ! -f inventory.json ]; then
+                    echo "::error::inventory.json 未生成，可能 Cookie 过期或 Steam 限流"
+                    exit 1
+                  fi
+                  COUNT=$(python -c "import json; d=json.load(open('inventory.json',encoding='utf-8')); print(len(d['assets']))")
+                  echo "assets 数量: $COUNT"
+                  if [ "$COUNT" -lt 100 ]; then
+                    echo "::error::assets 数量异常 ($COUNT)，可能 Cookie 过期"
+                    exit 1
+                  fi
+
             - name: Push to D1
               working-directory: ./steam-inventory-worker
               env:
