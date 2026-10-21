@@ -402,23 +402,38 @@ def fetch_full_inventory(steamid, timeout=30, cookies=None):
 # ---------------------------------------------------------------------------
 # 入口
 # ---------------------------------------------------------------------------
+import os   # 如果文件顶部还没有，加上
+
 def main():
     parser = argparse.ArgumentParser(description="拉取 CS2 库存 → inventory.json")
-    parser.add_argument("--steamid", required=True, help="SteamID64（17 位数字）")
+    parser.add_argument("--steamid",
+                        default=os.environ.get("STEAM_ID", ""),
+                        help="SteamID64（17 位数字），默认读环境变量 STEAM_ID")
     parser.add_argument("--out", default="inventory.json", help="输出 JSON 路径")
     parser.add_argument("--timeout", type=int, default=30)
-    parser.add_argument("--steam-login-secure", default="",
-                        help="浏览器 cookie steamLoginSecure 的值（带 Cookie 可大幅降低 429 概率）")
-    parser.add_argument("--sessionid", default="",
-                        help="浏览器 cookie sessionid 的值")
+    parser.add_argument("--steam-login-secure",
+                        default=os.environ.get("STEAM_LOGIN_SECURE", ""),
+                        help="浏览器 cookie steamLoginSecure 的值，默认读环境变量 STEAM_LOGIN_SECURE")
+    parser.add_argument("--sessionid",
+                        default=os.environ.get("STEAM_SESSIONID", ""),
+                        help="浏览器 cookie sessionid 的值，默认读环境变量 STEAM_SESSIONID")
     args = parser.parse_args()
 
-    # ⭐ 构造 cookies
+    if not args.steamid:
+        parser.error("缺少 --steamid 或环境变量 STEAM_ID")
+
     cookies = {}
     if args.steam_login_secure:
         cookies["steamLoginSecure"] = args.steam_login_secure
     if args.sessionid:
         cookies["sessionid"] = args.sessionid
+
+    if cookies:
+        print(f"使用登录态请求（Cookie: {', '.join(cookies.keys())}）", file=sys.stderr)
+    else:
+        print("⚠️ 未提供 Cookie，匿名请求容易被 429", file=sys.stderr)
+
+    # ... 后面不变
 
     if cookies:
         print(f"使用登录态请求（Cookie: {', '.join(cookies.keys())}）", file=sys.stderr)
